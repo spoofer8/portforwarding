@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Forwarding</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            padding: 1rem;
+        }
+
+        /* Center Content */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 90%; /* Allows scaling */
+        }
+
+        /* Header Styling */
+        h1, h2, h3 {
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        /* Form Styling */
+        form {
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .form-row-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: 500;
+            white-space: nowrap; /* Keeps label on one line */
+        }
+
+        select {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333333;
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.95rem; }
+        th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #333333; }
+        th { color: #aaaaaa; font-weight: 500; }
+
+        input[type="text"] {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333333;
+            padding: 0.6rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            width: 15em; /* Moderate input width */
+            max-width: 100%; /* Ensures responsiveness */
+        }
+
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #004094;
+        }
+
+        /* Rules Section */
+        pre {
+            background-color: #1e1e1e;
+            color: #d1d1d1;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        /* Enhancements for Accessibility */
+        input:focus, button:focus {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .form-row-inline {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Port Forwarding</h1>
+        {% if public_ip %}<h3>Public IP: <strong>{{ public_ip }}</strong></h3>{% endif %}
+        <form method="POST">
+            <div class="form-row">
+                <label for="ip">IP Address:</label>
+                <input type="text" id="ip" name="ip" placeholder="Enter IP Address" required>
+            </div>
+            <div class="form-row-inline">
+                <label for="port">Port:</label>
+                <input type="text" id="port" name="port" placeholder="Enter Port" required>
+            </div>
+            <div class="form-row-inline">
+                <label for="proto">Protocol:</label>
+                <select id="proto" name="proto">
+                    <option value="tcp">TCP</option>
+                    <option value="udp">UDP</option>
+                    <option value="both">TCP + UDP</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <button type="submit" name="action" value="add">Add Rule</button>
+                <button type="submit" name="action" value="remove">Remove Rule</button>
+            </div>
+        </form>
+        <h2>Saved Rules</h2>
+        <p style="color:#aaaaaa">Re-applied automatically whenever the service starts, including after a reboot.</p>
+        <table>
+            <thead><tr><th>Protocol</th><th>Port</th><th>Destination</th></tr></thead>
+            <tbody>
+            {% for r in saved %}
+                <tr><td>{{ r.proto | upper }}</td><td>{{ r.port }}</td><td>{{ r.ip }}:{{ r.port }}</td></tr>
+            {% else %}
+                <tr><td colspan="3">No saved rules.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <h2>Current Rules</h2>
+        <pre>{{ rules }}</pre>
+    </div>
+</body>
+</html>

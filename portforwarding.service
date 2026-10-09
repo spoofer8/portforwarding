@@ -1,0 +1,23 @@
+[Unit]
+Description=Port Forwarding Daemon
+# Binds to the Tailscale IP, so wait for tailscaled; keep retrying (not giving up) if it's still coming up.
+After=network-online.target tailscaled.service docker.service
+Wants=network-online.target tailscaled.service
+StartLimitIntervalSec=0
+
+[Service]
+# This machine's Tailscale IP (tailscale ip -4) and the public IP the ports are forwarded from.
+Environment=PF_BIND_IP=100.64.0.1
+Environment=PF_PUBLIC_IP=203.0.113.10
+ExecStart=/root/portforwarding/.venv/bin/python3 /root/portforwarding/tailportforward.py
+WorkingDirectory=/root/portforwarding
+Restart=always
+RestartSec=5
+User=root
+Group=root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

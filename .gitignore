@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+rules.json
+rules.json.tmp
+backup-*/
